@@ -1,18 +1,49 @@
-// HomeScreen.js
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, Image, StyleSheet } from 'react-native';
 
-const data = [
-  { id: 1, name: 'Mecânica 1', rating: 4.9, specs: ['Especificações', 'Especificações'], logo: 'https://via.placeholder.com/50' },
-  { id: 2, name: 'Mecânica 2', rating: 4.7, specs: ['Especificações', 'Especificações'], logo: 'https://via.placeholder.com/50' },
-  { id: 3, name: 'Mecânica', rating: 4.7, specs: ['Especificações', 'Especificações'], logo: 'https://via.placeholder.com/50' },
-  // Adicione mais dados conforme necessário
-];
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, FlatList, Image, StyleSheet, ActivityIndicator } from 'react-native';
 
 const HomeScreen = () => {
+  const [data, setData] = useState([]); 
+  const [loading, setLoading] = useState(true); 
+
+
+  const fetchMecanicas = async () => {
+    try {
+      const response = await fetch('http://3.17.16.63:3000/mecanivel/company/all_companies', {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        }
+      }); 
+      const json = await response.json();
+      console.log(response);
+      
+      setData(json);
+    } catch (error) {
+      console.error('Erro ao buscar dados da API:', error);
+    } finally {
+      setLoading(false); 
+    }
+  };
+
+
+  useEffect(() => {
+    fetchMecanicas();
+  }, []);
+
+
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-     
+      
       <View style={styles.searchBar}>
         <TextInput style={styles.searchInput} placeholder="Buscar" />
         <TouchableOpacity style={styles.filterButton}>
@@ -23,7 +54,7 @@ const HomeScreen = () => {
         </TouchableOpacity>
       </View>
 
-     
+
       <FlatList
         data={data}
         keyExtractor={(item) => item.id.toString()}
@@ -32,8 +63,6 @@ const HomeScreen = () => {
             <Image source={{ uri: item.logo }} style={styles.logo} />
             <View style={styles.details}>
               <Text style={styles.name}>{item.name}</Text>
-              <Text style={styles.specs}>- {item.specs[0]}</Text>
-              <Text style={styles.specs}>- {item.specs[1]}</Text>
             </View>
             <View style={styles.ratingContainer}>
               <Text style={styles.rating}>{item.rating}</Text>
@@ -43,7 +72,7 @@ const HomeScreen = () => {
         )}
       />
 
-     
+      {/* Seção 'Visitados Recentemente' */}
       <Text style={styles.recentlyVisitedText}>Visitados Recentemente</Text>
       <FlatList
         data={data}
@@ -54,8 +83,6 @@ const HomeScreen = () => {
             <Image source={{ uri: item.logo }} style={styles.smallLogo} />
             <View style={styles.details}>
               <Text style={styles.name}>{item.name}</Text>
-              <Text style={styles.specs}>- {item.specs[0]}</Text>
-              <Text style={styles.specs}>- {item.specs[1]}</Text>
             </View>
             <View style={styles.ratingContainer}>
               <Text style={styles.rating}>{item.rating}</Text>
@@ -135,7 +162,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  star: {
+  star: { 
     fontSize: 16,
     color: '#ffd700',
   },
@@ -148,7 +175,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 10,
     marginRight: 10,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#546474',
     borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -159,6 +186,11 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     marginRight: 10,
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

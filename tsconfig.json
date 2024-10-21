@@ -8,10 +8,13 @@
       ]
     }
   },
+  "android": {
+    "usesCleartextTraffic": true
+},
   "include": [
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-  ]
+, "app/(tabs)/index.jsx", "pages/HomeScreen.jsx"  ]
 }
