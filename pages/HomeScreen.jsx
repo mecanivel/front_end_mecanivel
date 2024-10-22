@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, Image, StyleSheet, ActivityIndicator } from 'react-native';
 
@@ -6,10 +5,9 @@ const HomeScreen = () => {
   const [data, setData] = useState([]); 
   const [loading, setLoading] = useState(true); 
 
-
   const fetchMecanicas = async () => {
     try {
-      const response = await fetch('http://3.17.16.63:3000/mecanivel/company/all_companies', {
+      const response = await fetch('http://3.17.16.63:8080/mecanivel/company/all_companies', {
         method: 'GET',
         headers: {
           Accept: 'application/json',
@@ -17,9 +15,20 @@ const HomeScreen = () => {
         }
       }); 
       const json = await response.json();
-      console.log(response);
+      console.log(json);
       
-      setData(json);
+      const updatedData = await Promise.all(
+        json.map(async (item) => {
+          
+          const base64String = convertArrayBufferToBase64(item.image.data);
+          return {
+            ...item,
+            image: `data:image/jpeg;base64,${base64String}`
+          };
+        })
+      );
+  
+      setData(updatedData);
     } catch (error) {
       console.error('Erro ao buscar dados da API:', error);
     } finally {
@@ -28,10 +37,19 @@ const HomeScreen = () => {
   };
 
 
+  const convertArrayBufferToBase64 = (buffer) => {
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary); 
+  };
+
   useEffect(() => {
     fetchMecanicas();
   }, []);
-
 
   if (loading) {
     return (
@@ -43,7 +61,6 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      
       <View style={styles.searchBar}>
         <TextInput style={styles.searchInput} placeholder="Buscar" />
         <TouchableOpacity style={styles.filterButton}>
@@ -54,13 +71,12 @@ const HomeScreen = () => {
         </TouchableOpacity>
       </View>
 
-
       <FlatList
         data={data}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.card}>
-            <Image source={{ uri: item.logo }} style={styles.logo} />
+            <Image source={{ uri: item.image }} style={styles.logo} />
             <View style={styles.details}>
               <Text style={styles.name}>{item.name}</Text>
             </View>
@@ -72,7 +88,7 @@ const HomeScreen = () => {
         )}
       />
 
-      {/* Seção 'Visitados Recentemente' */}
+
       <Text style={styles.recentlyVisitedText}>Visitados Recentemente</Text>
       <FlatList
         data={data}
@@ -80,7 +96,7 @@ const HomeScreen = () => {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.smallCard}>
-            <Image source={{ uri: item.logo }} style={styles.smallLogo} />
+            <Image source={{ uri: item.image }} style={styles.smallLogo} />
             <View style={styles.details}>
               <Text style={styles.name}>{item.name}</Text>
             </View>
@@ -149,10 +165,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     marginBottom: 5,
-  },
-  specs: {
-    fontSize: 14,
-    color: '#555',
   },
   ratingContainer: {
     justifyContent: 'center',
