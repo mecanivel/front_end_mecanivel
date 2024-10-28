@@ -1,13 +1,16 @@
+import { useNavigation } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, Image, StyleSheet, ActivityIndicator } from 'react-native';
 
 const HomeScreen = () => {
   const [data, setData] = useState([]); 
   const [loading, setLoading] = useState(true); 
+  const navigation = useNavigation();
 
+  
   const fetchMecanicas = async () => {
     try {
-      const response = await fetch('http://3.17.16.63:8080/mecanivel/company/all_companies', {
+      const response = await fetch('http://3.17.16.63:3000/mecanivel/company/all_companies', {
         method: 'GET',
         headers: {
           Accept: 'application/json',
@@ -75,7 +78,10 @@ const HomeScreen = () => {
         data={data}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <View style={styles.card}>
+          <TouchableOpacity 
+          onPress={()=> navigation.navigate('CardOpened', {companyId:item.id})}
+          style={styles.card}>
+        
             <Image source={{ uri: item.image }} style={styles.logo} />
             <View style={styles.details}>
               <Text style={styles.name}>{item.name}</Text>
@@ -84,7 +90,8 @@ const HomeScreen = () => {
               <Text style={styles.rating}>{item.rating}</Text>
               <Text style={styles.star}>★</Text>
             </View>
-          </View>
+        
+          </TouchableOpacity>
         )}
       />
 

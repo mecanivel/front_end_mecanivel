@@ -9,7 +9,8 @@
     }
   },
   "android": {
-    "usesCleartextTraffic": true
+    "usesCleartextTraffic": true,
+    "permissions": ["INTERNET"]
 },
   "include": [
     "**/*.ts",
