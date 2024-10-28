@@ -1,7 +1,7 @@
 import { useNavigation } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, Image, StyleSheet, ActivityIndicator } from 'react-native';
-
+import {BASE_URL} from '@env';
 const HomeScreen = () => {
   const [data, setData] = useState([]); 
   const [loading, setLoading] = useState(true); 
@@ -10,7 +10,7 @@ const HomeScreen = () => {
   
   const fetchMecanicas = async () => {
     try {
-      const response = await fetch('http://3.17.16.63:3000/mecanivel/company/all_companies', {
+      const response = await fetch(`${BASE_URL}/company/all_companies`, {
         method: 'GET',
         headers: {
           Accept: 'application/json',

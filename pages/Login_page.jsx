@@ -1,36 +1,46 @@
+import axios from 'axios';
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
+import {BASE_URL} from '@env';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from 'expo-router';
 
 export default function LoginScreen() {
-  const [login, setLogin] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const navigation = useNavigation();
 
-  const handleLogin = () => {
-    if (login === '' || password === '') {
-      Alert.alert('Erro', 'Preencha todos os campos.');
-    } else {
-     
-      Alert.alert('Sucesso', 'Login realizado com sucesso!');
+  const handleLogin = async () => {
+
+    try {
+        const response = await axios.post(`${BASE_URL}/auth`, {
+          username,
+          password
+        });
+        if(response.data.token){
+          await AsyncStorage.setItem('token', response.data.token);
+          navigation.navigate('HomeScreen');
+        }else {
+          Alert.alert('erro', 'Credenciais inválidas');
+        }
+    } catch (error) {
+      Alert.alert('Erro', 'Credenciais inválidas');
+      console.error(error);
     }
   };
 
   return (
     <View style={styles.container}>
-
       <Image
-        source={require('../assets/images/logo_mecanivel.png')} 
+        source={require('../assets/images/logo_mecanivel.jpg')} 
         style={styles.logo}
       />
-
-     
       <TextInput
         style={styles.input}
         placeholder="Login"
-        value={login}
-        onChangeText={setLogin}
+        value={username}
+        onChangeText={setUsername}
       />
-
-     
       <TextInput
         style={styles.input}
         placeholder="Senha"
@@ -38,13 +48,9 @@ export default function LoginScreen() {
         value={password}
         onChangeText={setPassword}
       />
-
-      
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Entrar</Text>
       </TouchableOpacity>
-
-      
       <View style={styles.linksContainer}>
         <TouchableOpacity>
           <Text style={styles.linkText}>Cadastrar-se</Text>
