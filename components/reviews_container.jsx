@@ -60,8 +60,8 @@ export default function ReviewsContainer({ companyId }) {
             <View style={styles.card}>
                 <Text style={styles.name}>{customer ? customer.name : "Nome não disponível"}</Text>
                 <Text style={styles.description}>{item.description}</Text>
-                <Text style={styles.rating}>{item.grade}</Text>
-                <Text style={styles.star}>★</Text>
+                <Text style={styles.rating}>{item.grade} <Text style={styles.star}>★</Text></Text>
+                
             </View>
         );
     };

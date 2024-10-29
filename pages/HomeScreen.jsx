@@ -1,7 +1,7 @@
 import { useNavigation } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, Image, StyleSheet, ActivityIndicator } from 'react-native';
-
+import MainMenu from '@/components/navigationMenu';
 
 const HomeScreen = () => {
   const [data, setData] = useState([]); 
@@ -119,6 +119,9 @@ const HomeScreen = () => {
           </View>
         )}
       />
+
+        
+  
     </View>
   );
 };

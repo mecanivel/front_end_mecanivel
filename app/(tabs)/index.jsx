@@ -4,22 +4,28 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomeScreen from '@/pages/HomeScreen';
 import CardOpened from '@/pages/opened_card';
 import LoginScreen from '@/pages/Login_page';
+import MainMenu from '@/components/navigationMenu';
 
 
 const Stack = createNativeStackNavigator();
 
 const App = () => {
   return (
-    <NavigationContainer independent={true}>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="HomeScreen"
-          component={HomeScreen}
-          options={{title: 'Welcome'}}
+    <NavigationContainer independent={true} >
+      <Stack.Navigator initialRouteName='MainMenu'>
+        
+        <Stack.Screen 
+        name="MainMenu"
+        component={MainMenu} 
+        options={{ headerShown: false }}
         />
       <Stack.Screen name='CardOpened' component={CardOpened}/>
       <Stack.Screen name='LoginScreen' component={LoginScreen}/>
+
+
       </Stack.Navigator>
+
+     
     </NavigationContainer>
   );
 };
