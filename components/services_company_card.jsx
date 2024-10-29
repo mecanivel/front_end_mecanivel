@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, Image, StyleSheet } from 'react-native';
 import axios from 'axios';
-import {BASE_URL } from '@env';
+import { BASE_URL } from '@env';
 
 
 const ServicesCardCompany = ({ companyId }) => {
     const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(true);
+   
 
-    console.log(BASE_URL);
-    
     useEffect(() => {
         const fetchServiceIds = async () => {
             try {
@@ -24,7 +23,7 @@ const ServicesCardCompany = ({ companyId }) => {
 
         const fetchServiceDetails = async (serviceIds) => {
             try {
-                console.log("LOGANDO IDS DOS SERVICOS", `${serviceIds.join(',')}`);
+                console.log("LOGANDO IDS DOS SERVIÇOS", `${serviceIds.join(',')}`);
                 const response = await axios.get(`${BASE_URL}/services/all_services?id=${serviceIds.join(',')}`);
 
                 if (response.data.length > 0) {

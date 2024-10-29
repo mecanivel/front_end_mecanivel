@@ -87,7 +87,7 @@ const HomeScreen = () => {
               <Text style={styles.name}>{item.name}</Text>
             </View>
             <View style={styles.ratingContainer}>
-              <Text style={styles.rating}>{item.rating}</Text>
+              <Text style={styles.rating}>{item.reviews_note.toFixed(1)}</Text>
               <Text style={styles.star}>★</Text>
             </View>
         
@@ -180,6 +180,7 @@ const styles = StyleSheet.create({
   rating: {
     fontSize: 16,
     fontWeight: 'bold',
+    color:'white',
   },
   star: { 
     fontSize: 16,

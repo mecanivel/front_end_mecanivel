@@ -3,12 +3,68 @@ import { View, Text, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import Location from '@/components/Location';
 import ServicesCompany from '@/components/services_company_card';
 import Whatsappbutton from '@/components/whatsapp_btn';
-import {BASE_URL} from '@env';
+import ButtonCreateReview from '@/components/btn_create_review';
+import ReviewContainer from '@/components/reviews_container';
+import { decode } from 'react-native-pure-jwt';
+import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 
 const CardOpened = ({ route }) => {
   const { companyId } = route.params; 
   const [company, setCompany] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [userId , setUserId] = useState('');
+  const { getItem } = useAsyncStorage('token');
+  const token = getItem();
+  console.log("parse",token);
+  
+  const parseJwt = (token) => {
+      try {
+          let base64Url = token.split('.')[1];
+          if (!base64Url) throw new Error("Token inválido: não possui payload.");
+
+          let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+          if (base64.length % 4 !== 0) {
+              base64 += '='.repeat(4 - (base64.length % 4));
+          }
+
+          let jsonPayload = decodeURIComponent(
+              atob(base64)
+                  .split('')
+                  .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                  .join('')
+          );
+
+          return JSON.parse(jsonPayload);
+      } catch (error) {
+          console.error("Erro ao decodificar o JWT:", error);
+          return null;
+      }
+  };
+
+  useEffect(() => {
+      const fetchToken = async () => {
+          try {
+              const encryptedToken = await getItem(); 
+              console.log("Token recuperado:", encryptedToken);
+              
+              if (encryptedToken) {
+                  const decodedToken = parseJwt(encryptedToken);
+                  console.log("Decodificado:", decodedToken);
+                  setUserId(decodedToken ? decodedToken.id : null);
+                  console.log("USER ID DO TOKEN", userId);
+              } else {
+                  console.error("Token está null ou vazio.");
+              }
+          } catch (error) {
+              console.error("Erro ao recuperar o token:", error);
+          }
+      };
+
+      fetchToken();
+  }, [getItem]);
+
+
+
 
   const fetchCompanyDetails = async () => {
     try {
@@ -71,6 +127,8 @@ const CardOpened = ({ route }) => {
       <Text>{company.location}</Text>
       <Location address={company.address}/>
       <ServicesCompany companyId={companyId}/>
+      <ReviewContainer companyId={companyId}/>
+      <ButtonCreateReview companyId={companyId} customerId={userId} />
     </View>
   );
 };
