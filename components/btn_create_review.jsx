@@ -104,6 +104,8 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom:50,
+    marginTop:30
   },
   button: {
     backgroundColor: '#607D8B',

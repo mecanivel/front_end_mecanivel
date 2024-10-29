@@ -88,7 +88,11 @@ const HomeScreen = () => {
               <Text style={styles.name}>{item.name}</Text>
             </View>
             <View style={styles.ratingContainer}>
-              <Text style={styles.rating}>{item.reviews_note.toFixed(1)}</Text>
+            <Text style={styles.rating}>
+              {item.reviews_note != null ? `${item.reviews_note.toFixed(1)}` : " "}
+            </Text>
+
+
               <Text style={styles.star}>★</Text>
             </View>
         

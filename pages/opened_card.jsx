@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, Image, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
 import Location from '@/components/Location';
 import ServicesCompany from '@/components/services_company_card';
 import Whatsappbutton from '@/components/whatsapp_btn';
@@ -9,79 +9,66 @@ import { decode } from 'react-native-pure-jwt';
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 
 const CardOpened = ({ route }) => {
-  const { companyId } = route.params; 
+  const { companyId } = route.params;
   const [company, setCompany] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [userId , setUserId] = useState('');
+  const [userId, setUserId] = useState('');
   const { getItem } = useAsyncStorage('token');
-  const token = getItem();
-  console.log("parse",token);
-  
-  const parseJwt = (token) => {
-      try {
-          let base64Url = token.split('.')[1];
-          if (!base64Url) throw new Error("Token inválido: não possui payload.");
-
-          let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-          if (base64.length % 4 !== 0) {
-              base64 += '='.repeat(4 - (base64.length % 4));
-          }
-
-          let jsonPayload = decodeURIComponent(
-              atob(base64)
-                  .split('')
-                  .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-                  .join('')
-          );
-
-          return JSON.parse(jsonPayload);
-      } catch (error) {
-          console.error("Erro ao decodificar o JWT:", error);
-          return null;
-      }
-  };
 
   useEffect(() => {
-      const fetchToken = async () => {
-          try {
-              const encryptedToken = await getItem(); 
-              console.log("Token recuperado:", encryptedToken);
-              
-              if (encryptedToken) {
-                  const decodedToken = parseJwt(encryptedToken);
-                  console.log("Decodificado:", decodedToken);
-                  setUserId(decodedToken ? decodedToken.id : null);
-                  console.log("USER ID DO TOKEN", userId);
-              } else {
-                  console.error("Token está null ou vazio.");
-              }
-          } catch (error) {
-              console.error("Erro ao recuperar o token:", error);
-          }
-      };
+    const fetchToken = async () => {
+      try {
+        const encryptedToken = await getItem();
+        if (encryptedToken) {
+          const decodedToken = parseJwt(encryptedToken);
+          console.log(decodedToken);
+          
+          setUserId(decodedToken ? decodedToken.id : null);
+          console.log("LOGANDO ID USER ", userId);
+          
+        }
+      } catch (error) {
+        console.error("Erro ao recuperar o token:", error);
+      }
+    };
 
-      fetchToken();
+    fetchToken();
   }, [getItem]);
 
+  const parseJwt = (token) => {
+    try {
+        let base64Url = token.split('.')[1];
+        if (!base64Url) throw new Error("Token inválido: não possui payload.");
 
+        let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        if (base64.length % 4 !== 0) {
+            base64 += '='.repeat(4 - (base64.length % 4));
+        }
 
+        let jsonPayload = decodeURIComponent(
+            atob(base64)
+                .split('')
+                .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                .join('')
+        );
+
+        return JSON.parse(jsonPayload);
+    } catch (error) {
+        console.error("Erro ao decodificar o JWT:", error);
+        return null;
+    }
+};
 
   const fetchCompanyDetails = async () => {
     try {
       const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/company/all_companies?id=${companyId}`);
       const json = await response.json();
-      console.log("DADOS EMPRESA CARD ABERTO:",response);
-      
-      console.log("LOGANDO ID DA EMPRESA NO CARD ABERTO",companyId);
-      
+
       if (json.length > 0) {
-        const item = json[0]; 
-        
-        
+        const item = json[0];
         const base64String = convertArrayBufferToBase64(item.image.data);
         item.image = `data:image/jpeg;base64,${base64String}`;
-
-        setCompany(item); 
+        setCompany(item);
       }
     } catch (error) {
       console.error('Erro ao buscar detalhes da empresa:', error);
@@ -97,8 +84,12 @@ const CardOpened = ({ route }) => {
     for (let i = 0; i < len; i++) {
       binary += String.fromCharCode(bytes[i]);
     }
-    return btoa(binary);
+    return btoa(binary); 
   };
+
+  useEffect(() => {
+    fetchCompanyDetails();
+  }, []);
 
   useEffect(() => {
     fetchCompanyDetails();
@@ -116,11 +107,11 @@ const CardOpened = ({ route }) => {
     return <Text>Empresa não encontrada</Text>;
   }
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.contaier_image_name}>
-      <Image source={{ uri: company.image }} style={styles.logo} />
-      <Text style={styles.name}>{company.name}</Text>
+  const renderContent = () => (
+    <View style={styles.contentContainer}>
+      <View style={styles.containerImageName}>
+        <Image source={{ uri: company.image }} style={styles.logo} />
+        <Text style={styles.name}>{company.name}</Text>
       </View>
       <Whatsappbutton phoneNumber={company.phone}/>
       <Text>{company.description}</Text>
@@ -131,17 +122,25 @@ const CardOpened = ({ route }) => {
       <ButtonCreateReview companyId={companyId} customerId={userId} />
     </View>
   );
+
+  return (
+    <FlatList
+      data={[{}]} // Dummy data para renderizar uma única vez
+      renderItem={renderContent}
+      keyExtractor={() => "unique_key"}
+      style={styles.container}
+    />
+  );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-
   },
-  contaier_image_name:{
-    flexDirection: 'row', // Alinha a imagem e o nome da empresa horizontalmente
-    alignItems: 'center', // Centraliza verticalmente os itens
+  containerImageName: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 10,
   },
   loaderContainer: {
@@ -157,12 +156,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
-  
 });
 
-
-
-
-
-
-export default CardOpened
+export default CardOpened;
