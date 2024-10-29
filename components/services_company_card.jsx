@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, Image, StyleSheet } from 'react-native';
 import axios from 'axios';
+<<<<<<< HEAD
 import { BASE_URL } from '@env';
+=======
+
+>>>>>>> 76303614b4a3c8ffe57a292134f4c97b71e57d1d
 
 
 const ServicesCardCompany = ({ companyId }) => {
@@ -9,10 +13,15 @@ const ServicesCardCompany = ({ companyId }) => {
     const [loading, setLoading] = useState(true);
    
 
+<<<<<<< HEAD
+=======
+    console.log(EXPO_PUBLIC_API_URL);
+    
+>>>>>>> 76303614b4a3c8ffe57a292134f4c97b71e57d1d
     useEffect(() => {
         const fetchServiceIds = async () => {
             try {
-                const response = await axios.get(`${BASE_URL}/services/filter_services_by_companies?companyId=${companyId}`);
+                const response = await axios.get(`${process.env.EXPO_PUBLIC_API_URL}/services/filter_services_by_companies?companyId=${companyId}`);
                 const serviceIds = response.data.map(service => service.serviceId);
                 
                 fetchServiceDetails(serviceIds);
@@ -23,8 +32,13 @@ const ServicesCardCompany = ({ companyId }) => {
 
         const fetchServiceDetails = async (serviceIds) => {
             try {
+<<<<<<< HEAD
                 console.log("LOGANDO IDS DOS SERVIÇOS", `${serviceIds.join(',')}`);
                 const response = await axios.get(`${BASE_URL}/services/all_services?id=${serviceIds.join(',')}`);
+=======
+                console.log("LOGANDO IDS DOS SERVICOS", `${serviceIds.join(',')}`);
+                const response = await axios.get(`${process.env.EXPO_PUBLIC_API_URL}/services/all_services?id=${serviceIds.join(',')}`);
+>>>>>>> 76303614b4a3c8ffe57a292134f4c97b71e57d1d
 
                 if (response.data.length > 0) {
                     const servicesData = response.data.map(item => {

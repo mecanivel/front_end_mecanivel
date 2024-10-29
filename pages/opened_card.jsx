@@ -68,7 +68,7 @@ const CardOpened = ({ route }) => {
 
   const fetchCompanyDetails = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/company/all_companies?id=${companyId}`);
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/company/all_companies?id=${companyId}`);
       const json = await response.json();
       console.log("DADOS EMPRESA CARD ABERTO:",response);
       
@@ -159,11 +159,6 @@ const styles = StyleSheet.create({
   },
   
 });
-
-
-
-
-
 
 
 
