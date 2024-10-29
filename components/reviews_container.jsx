@@ -25,7 +25,7 @@ export default function ReviewsContainer({ companyId }) {
 
         const fetchCustomers = async (customerIds) => {
             try {
-                const response = await axios.get(`${BASE_URL}/customer/all?id=${customerIds.join(',')}`);
+                const response = await axios.get(`${process.env.EXPO_PUBLIC_API_URL}/customer/all?id=${customerIds.join(',')}`);
                 const customerData = response.data;
 
                 const customerMap = {};
