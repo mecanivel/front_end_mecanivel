@@ -3,7 +3,7 @@ import { View, Text, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import Location from '@/components/Location';
 import ServicesCompany from '@/components/services_company_card';
 import Whatsappbutton from '@/components/whatsapp_btn';
-import {BASE_URL} from '@env';
+
 
 const CardOpened = ({ route }) => {
   const { companyId } = route.params; 
@@ -12,7 +12,7 @@ const CardOpened = ({ route }) => {
 
   const fetchCompanyDetails = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/company/all_companies?id=${companyId}`);
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/company/all_companies?id=${companyId}`);
       const json = await response.json();
       console.log("DADOS EMPRESA CARD ABERTO:",response);
       

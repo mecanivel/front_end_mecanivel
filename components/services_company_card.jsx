@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, Image, StyleSheet } from 'react-native';
 import axios from 'axios';
-import {BASE_URL } from '@env';
+
 
 
 const ServicesCardCompany = ({ companyId }) => {
     const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    console.log(BASE_URL);
+    console.log(EXPO_PUBLIC_API_URL);
     
     useEffect(() => {
         const fetchServiceIds = async () => {
             try {
-                const response = await axios.get(`${BASE_URL}/services/filter_services_by_companies?companyId=${companyId}`);
+                const response = await axios.get(`${process.env.EXPO_PUBLIC_API_URL}/services/filter_services_by_companies?companyId=${companyId}`);
                 const serviceIds = response.data.map(service => service.serviceId);
                 
                 fetchServiceDetails(serviceIds);
@@ -25,7 +25,7 @@ const ServicesCardCompany = ({ companyId }) => {
         const fetchServiceDetails = async (serviceIds) => {
             try {
                 console.log("LOGANDO IDS DOS SERVICOS", `${serviceIds.join(',')}`);
-                const response = await axios.get(`${BASE_URL}/services/all_services?id=${serviceIds.join(',')}`);
+                const response = await axios.get(`${process.env.EXPO_PUBLIC_API_URL}/services/all_services?id=${serviceIds.join(',')}`);
 
                 if (response.data.length > 0) {
                     const servicesData = response.data.map(item => {

@@ -17,6 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
+        "package": "com.front_end_mecanivel.index.jsx",
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       }
