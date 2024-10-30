@@ -1,6 +1,8 @@
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
 import { View, Text, Button, StyleSheet, ActivityIndicator } from "react-native";
+import { FontAwesome } from '@expo/vector-icons';
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 export default function ProfileInformation() {
     const { getItem } = useAsyncStorage('token');
@@ -82,43 +84,86 @@ export default function ProfileInformation() {
     }
     return (
         <View style={styles.container}>
-            <Text style={styles.headerText}>Informações do Usuário</Text>
+            
             {customers.length > 0 ? (
                 customers.map(customer => (
-                    <Text key={customer.id} style={styles.namecustomer}>{customer.name}</Text>
+                    <View style={styles.userContainer}>
+                    <FontAwesome style={styles.iconUser} name="user" size={40} color="white" /> 
+                      <Text key={customer.id} style={styles.nameCustomer}> 
+                    
+                            {customer.name}
+                    </Text>
+                    
+                    </View>
                 ))
             ) : (
                 <Text>Informações do cliente não encontradas.</Text>
             )}
 
             <View style={styles.menuOptions}>
-                <Button title="Tornar-se Mecânico" onPress={() => { /* Lógica do botão */ }} />
-                <Button title="Serviços Solicitados" onPress={() => { /* Lógica do botão */ }} />
+            <TouchableOpacity style={styles.button} onPress={() => { /* Lógica do botão */ }}>
+                    <FontAwesome name="wrench" size={20} color="blue" style={styles.icon} />
+                    <Text style={styles.buttonText}>Tornar-se Mecânico</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity style={styles.button} onPress={() => { /* Lógica do botão */ }}>
+                    <FontAwesome name="clipboard" size={20} color="blue" style={styles.icon} />
+                    <Text style={styles.buttonText}>Serviços Solicitados</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.button} onPress={() => { /* Lógica do botão */ }}>
+                    <FontAwesome name="car" size={20} color="blue" style={styles.icon} />
+                    <Text style={styles.buttonText}>Meus Carros</Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
 }
-const styles = StyleSheet.create({
-    namecustomer:{
-        color:"#00000"
-    },
 
+
+const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
         backgroundColor: '#f4f4f4',
+        color:"white"
     },
     headerText: {
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 20,
     },
+    userContainer: {
+        flexDirection: 'row', 
+        alignItems: 'center',
+        justifyContent:"flex-start",
+        backgroundColor:"#364c5d",
+        padding:20,
+        color: 'white',
+    },
+    iconUser: {
+        marginRight: 20,  
+        color: 'white',
+    },
+    nameCustomer: {
+        fontSize: 16,
+        color: 'white',
+        
+    },
     menuOptions: {
         marginTop: 20,
     },
-    loaderContainer: {
-        flex: 1,
-        justifyContent: 'center',
+    button: {
+        flexDirection: 'row',
         alignItems: 'center',
+        backgroundColor: '#f4f4f4',
+        padding: 10,
+        borderRadius: 8,
+        marginBottom: 10,
+        marginLeft:20
+    },
+    buttonText: {
+        fontSize: 16,
+        color: 'black',
+        marginLeft:20
     },
 });
