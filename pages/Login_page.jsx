@@ -18,7 +18,7 @@ export default function LoginScreen() {
         });
         if(response.data.token){
           await AsyncStorage.setItem('token', response.data.token);
-          navigation.navigate('HomeScreen');
+          navigation.navigate('LoginPage');
         }else {
           Alert.alert('erro', 'Credenciais inválidas');
         }
