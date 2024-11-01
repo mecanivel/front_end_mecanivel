@@ -5,6 +5,7 @@ import MainTabs from './MainTabs';
 import { NavigationContainer } from '@react-navigation/native';
 import LoginScreen from '@/pages/Login_page';
 import RegisterScreen from '@/pages/register_page';
+import CardOpened from '@/pages/opened_card';
 import { Stack } from 'expo-router';
 
 
@@ -29,6 +30,12 @@ const App = () => {
             <Stack.Screen
                     name="RegisterScreen"
                     component={RegisterScreen}
+                    options={{ headerShown: false }}
+            />
+
+            <Stack.Screen
+                    name="CardOpened"
+                    component={CardOpened}
                     options={{ headerShown: false }}
             />
             
