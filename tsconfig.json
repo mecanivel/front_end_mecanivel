@@ -10,7 +10,19 @@
   },
   "android": {
     "usesCleartextTraffic": true,
-    "permissions": ["INTERNET"]
+    "permissions": ["INTERNET",
+        "CAMERA",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE"],
+        
+   
+},
+"ios": {
+  "supportsTablet": true,
+  "infoPlist": {
+    "NSCameraUsageDescription": "Este aplicativo precisa de acesso à câmera para tirar fotos.",
+    "NSPhotoLibraryUsageDescription": "Este aplicativo precisa de acesso à biblioteca para escolher fotos."
+  }
 },
   "include": [
     "**/*.ts",

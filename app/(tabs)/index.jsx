@@ -5,44 +5,35 @@ import MainTabs from './MainTabs';
 import { NavigationContainer } from '@react-navigation/native';
 import LoginScreen from '@/pages/Login_page';
 import RegisterScreen from '@/pages/register_page';
-import CardOpened from '@/pages/opened_card';
-import { Stack } from 'expo-router';
+import HomeScreen from '@/pages/HomeScreen';
 
+const Stack = createNativeStackNavigator();
 
 const App = () => {
-  const Stack = createNativeStackNavigator();
-  return (
-    <NavigationContainer independent={true}>
-      
-      <Stack.Navigator>
-      <Stack.Screen
-              name="MainTabs"
-              component={MainTabs}
-              options={{ headerShown: false }}
-            />
-
-            <Stack.Screen
+    return (
+        <NavigationContainer independent={true}>
+            <Stack.Navigator>
+                <Stack.Screen
+                    name="MainTabs"
+                    component={MainTabs}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
                     name="LoginScreen"
                     component={LoginScreen}
                     options={{ headerShown: false }}
-            />
-
-            <Stack.Screen
+                />
+                <Stack.Screen
                     name="RegisterScreen"
                     component={RegisterScreen}
                     options={{ headerShown: false }}
-            />
-
-            <Stack.Screen
-                    name="CardOpened"
-                    component={CardOpened}
-                    options={{ headerShown: false }}
-            />
-            
-        </Stack.Navigator>
-        
-      </NavigationContainer>
-  );
+                />
+                
+               
+               
+            </Stack.Navigator>
+        </NavigationContainer>
+    );
 };
 
 export default App;

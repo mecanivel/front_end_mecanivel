@@ -25,7 +25,7 @@ export default function ProfileInformation({ navigation }) {
             } catch (error) {
                 console.error("Erro ao recuperar o token:", error);
             }
-            setLoading(false);  // Parar o loading após a verificação do token
+            setLoading(false);
         };
         fetchToken();
     }, [getItem]);
@@ -124,14 +124,10 @@ export default function ProfileInformation({ navigation }) {
                     )}
                     <View style={styles.menuOptions}>
                         <TouchableOpacity style={styles.button}>
-                            <FontAwesome name="wrench" size={20} color="blue" style={styles.icon} />
-                            <Text style={styles.buttonText}>Tornar-se Mecânico</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.button}>
                             <FontAwesome name="clipboard" size={20} color="blue" style={styles.icon} />
                             <Text style={styles.buttonText}>Serviços Solicitados</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.button}>
+                        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CarPage',{customer_id : userId})}>
                             <FontAwesome name="car" size={20} color="blue" style={styles.icon} />
                             <Text style={styles.buttonText}>Meus Carros</Text>
                         </TouchableOpacity>

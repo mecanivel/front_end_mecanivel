@@ -64,7 +64,9 @@ const HomeScreen = () => {
   }
 
   return (
+
     <View style={styles.container}>
+      <Text style={styles.textlocation}>Cascavel-PR</Text>
       <View style={styles.searchBar}>
         <TextInput style={styles.searchInput} placeholder="Buscar" />
         <TouchableOpacity style={styles.filterButton}>
@@ -80,7 +82,7 @@ const HomeScreen = () => {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity 
-          onPress={()=> navigation.navigate('CardOpened', {companyId:item.id})}
+          onPress={()=> navigation.navigate('OpenedCard', {companyId:item.id})}
           style={styles.card}>
         
             <Image source={{ uri: item.image }} style={styles.logo} />
@@ -130,6 +132,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+
+  },
+  textlocation:{
+    textAlign:'center',
+    marginBottom:10
   },
   searchBar: {
     flexDirection: 'row',
