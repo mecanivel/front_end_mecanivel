@@ -50,7 +50,7 @@ export default function MechanicRegisterForm() {
 
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/images/logo_mecanivel.jpg')} style={styles.logo} />
+      <Image source={require('../assets/images/mecanivel_logo.png')} style={styles.logo} />
       <Text style={styles.title}>Cadastre-se</Text>
 
       <TextInput style={styles.input} placeholder="Nome" value={name} onChangeText={setName} />
