@@ -52,8 +52,11 @@ export default function LoginScreen() {
         <Text style={styles.buttonText}>Entrar</Text>
       </TouchableOpacity>
       <View style={styles.linksContainer}>
-        <TouchableOpacity>
-          <Text style={styles.linkText}>Cadastrar-se</Text>
+        <TouchableOpacity> 
+          <Text style={styles.linkText} onPress={() => navigation.navigate('RegisterScreen')}>Cadastrar-se</Text>
+        </TouchableOpacity>
+        <TouchableOpacity> 
+          <Text style={styles.linkText}>Esqueceu a senha?</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -69,23 +72,25 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   logo: {
-    width: 150,
-    height: 150,
+    width: 315,
+    height: 100,
     resizeMode: 'contain',
     marginBottom: 40,
   },
   input: {
     width: '100%',
     height: 50,
-    backgroundColor: '#f1f1f1',
-    borderRadius: 8,
+    backgroundColor: '#FFF',
+    borderWidth: 1,
+    borderColor: '#34495E',
+    borderRadius: 2,
     paddingHorizontal: 16,
     marginBottom: 16,
   },
   button: {
     width: '100%',
     height: 50,
-    backgroundColor: 'gray',
+    backgroundColor: '#34495E',
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
@@ -97,6 +102,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   linksContainer: {
+    display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',

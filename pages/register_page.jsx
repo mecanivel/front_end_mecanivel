@@ -1,6 +1,7 @@
 import { useNavigation } from 'expo-router';
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
+import RegisterMechanicform from '@/components/MechanicRegisterForm';
 
 export default function RegisterScreen() {
   const [name, setName] = useState('');
@@ -59,59 +60,7 @@ export default function RegisterScreen() {
 
   return (
     <View style={styles.container}>
-      <Image
-        source={require('../assets/images/logo_mecanivel.jpg')} // Substitua pelo caminho correto da sua imagem
-        style={styles.logo}
-      />
-
-      <Text style={styles.title}>Cadastre-se</Text>
-
-      <TextInput
-        style={styles.input}
-        placeholder="Nome"
-        value={name}
-        onChangeText={setName}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="CPF"
-        value={Cpf}
-        onChangeText={setCpf}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Telefone"
-        value={phone}
-        onChangeText={setphone}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Usuario"
-        value={username}
-        onChangeText={setusername}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Senha"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
-
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Registrar-se</Text>
-      </TouchableOpacity>
+    <RegisterMechanicform/>
     </View>
   );
 }
@@ -120,41 +69,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
     backgroundColor: '#FFF',
-    padding: 24,
-  },
-  logo: {
-    width: 150,
-    height: 150,
-    resizeMode: 'contain',
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  input: {
-    width: '100%',
-    height: 50,
-    backgroundColor: '#f1f1f1',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    marginBottom: 16,
-  },
-  button: {
-    width: '100%',
-    height: 50,
-    backgroundColor: '#007BFF', // Mudança para melhor visibilidade
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
+    width: '100%',       
+    height: '100%',       
   },
 });
+  

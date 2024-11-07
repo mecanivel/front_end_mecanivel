@@ -1,40 +1,44 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Button, Image, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Button, Image, StyleSheet, ScrollView, Alert } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { Dropdown } from 'react-native-element-dropdown';
 import * as ImagePicker from 'expo-image-picker';
+import { useNavigation } from 'expo-router';
 
-const CarRegistrationScreen = ({ customer_id }) => {
+const CarRegistrationScreen = ({ route }) => {
     const [carName, setCarName] = useState('');
     const [kmsDriven, setKmsDriven] = useState('');
     const [pneuStatus, setPneuStatus] = useState('BOM');
     const [oilStatus, setOilStatus] = useState('BOM');
     const [brakePadsStatus, setBrakePadsStatus] = useState('BOM');
     const [image, setImage] = useState(null);
+    const { customer_id } = route.params;
+    const navigation = useNavigation();
 
-    const pickImage = () => {
-        launchImageLibrary(
-            {
-                mediaType: 'photo',
-                quality: 1,
-            },
-            (response) => {
-                if (response.didCancel) {
-                    console.log('User cancelled image picker');
-                } else if (response.errorCode) {
-                    console.log('ImagePicker Error: ', response.errorMessage);
-                } else if (response.assets && response.assets.length > 0) {
-                    setImage(response.assets[0].uri);
-                }
-            }
-        );
+    const pickImage = async ()  => {
+       try {
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes:ImagePicker.MediaTypeOptions.Images,
+            allowsEditing:true,
+            aspect:[1,1],
+            quality:1,
+        })
+
+        if (!result.canceled) {
+            setImage(result.assets[0].uri);
+        }
+       } catch (error) {
+         console.log("erro escolhendo imagem da galeria", error);
+         
+       }
     };
 
     const takePhoto = async () => {
         try {
-            await ImagePicker.requestCameraPermissionsAsync();
+                await ImagePicker.requestCameraPermissionsAsync();
             
-            const result = await ImagePicker.launchCameraAsync({
+                const result = await ImagePicker.launchCameraAsync({
                 allowsEditing: true,
                 aspect: [1, 1],
                 quality: 1,
@@ -43,7 +47,7 @@ const CarRegistrationScreen = ({ customer_id }) => {
             if (!result.canceled) {
                 setImage(result.assets[0].uri);
             }
-        } catch (error) {
+            }catch (error) {
             console.log("Erro ao tirar foto:", error);
         }
     };
@@ -62,7 +66,7 @@ const CarRegistrationScreen = ({ customer_id }) => {
                 uri: image,
                 type: 'image/png',
                 name: 'car_image.png',
-                size:300
+                size: 300
             });
         }
 
@@ -77,17 +81,32 @@ const CarRegistrationScreen = ({ customer_id }) => {
                 console.log('Carro criado com sucesso:', data);
 
                 
+
                 setCarName('');
                 setKmsDriven('');
                 setPneuStatus('BOM');
                 setOilStatus('BOM');
                 setBrakePadsStatus('BOM');
                 setImage(null);
+
+              
+                Alert.alert(
+                    'Sucesso',
+                    'Carro criado com sucesso!',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => navigation.navigate('CarPage', { customer_id })
+                        }
+                    ]
+                );
             } else {
                 console.error('Erro ao criar o carro:', response);
+                Alert.alert('Erro', 'Não foi possível criar o carro. Tente novamente.');
             }
         } catch (error) {
             console.error('Erro de conexão:', error.message);
+            Alert.alert('Erro', 'Ocorreu um erro de conexão. Verifique sua conexão com a internet.');
         }
     };
 
@@ -154,7 +173,7 @@ const CarRegistrationScreen = ({ customer_id }) => {
                 </View>
                 {image && <Image source={{ uri: image }} style={styles.image} />}
 
-                <TouchableOpacity style={styles.submitButton} onPress={()=> {handleSubmit()}}>
+                <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
                     <Text style={styles.submitButtonText}>Cadastrar Carro</Text>
                 </TouchableOpacity>
             </View>

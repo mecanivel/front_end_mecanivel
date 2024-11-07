@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, Image, Modal, TouchableOpacity, FlatList, Button, ActivityIndicator } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import axios from 'axios';
-import { useNavigation } from 'expo-router';
+import { useFocusEffect, useNavigation } from 'expo-router';
 
 const CarsPage = ({ route }) => {
     const [cars, setCars] = useState([]); 
@@ -13,6 +13,32 @@ const CarsPage = ({ route }) => {
     const { customer_id } = route.params;
     const navigation = useNavigation();
 
+    const fetchCars = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get(`${process.env.EXPO_PUBLIC_API_URL}/cars/get_all_cars?customer_id=${customer_id}`);
+            const carsWithImages = response.data.map((car) => {
+                if (car.image && car.image.data) {
+                    car.image = `data:image/jpeg;base64,${convertArrayBufferToBase64(car.image.data)}`;
+                }
+                return car;
+            });
+            setCars(carsWithImages);
+            if (!selectedCar && carsWithImages.length > 0) setSelectedCar(carsWithImages[0]);
+        } catch (error) {
+            console.error("Erro ao buscar os carros:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchCars();
+        }, [])
+    );
+    
     const getStatusColor = (status) => {
         console.log("STATUS", status);
         
@@ -27,33 +53,10 @@ const CarsPage = ({ route }) => {
                 return 'gray';
         }
     };
-    
-    const fetchCars = async () => {
-        try {
-            console.log(customer_id);
-            
-            const response = await axios.get(`${process.env.EXPO_PUBLIC_API_URL}/cars/get_all_cars?customer_id=${customer_id}`);
-            const carsWithImages = response.data.map((car) => {
-                const base64String = convertArrayBufferToBase64(car.image.data);
-                car.image = `data:image/jpeg;base64,${base64String}`;
-                return car;
-            });
-            
-            setCars(carsWithImages);
-            if (carsWithImages.length > 0) {
-                setSelectedCar(carsWithImages[0]); 
-            }
-        } catch (error) {
-            console.error("Erro ao buscar os carros:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
-    useEffect(() => {
-        fetchCars();
-    }, []);
+  
 
+   
     const convertArrayBufferToBase64 = (buffer) => {
         let binary = '';
         const bytes = new Uint8Array(buffer);
@@ -80,6 +83,7 @@ const CarsPage = ({ route }) => {
     </TouchableOpacity>
     );
 
+   
     return (
         <View style={styles.container}>
 
@@ -118,8 +122,8 @@ const CarsPage = ({ route }) => {
                         <View style={styles.statusboxbig}>
                         <Text style={[styles.statusTitle]}> Pneu </Text>
                             <View style={styles.statusBox}>
-                            <FontAwesome name="circle"  size={15} style={styles.statusIcon} color={getStatusColor(selectedCar.brake_pads_status)} />
-                            <View style={[styles.statusboxmenor,{ borderTopColor: getStatusColor(selectedCar.brake_pads_status) , borderTopWidth:2}]}>
+                            <FontAwesome name="circle"  size={15} style={styles.statusIcon} color={getStatusColor(selectedCar.pneu_status)} />
+                            <View style={[styles.statusboxmenor,{ borderTopColor: getStatusColor(selectedCar.pneu_status) , borderTopWidth:2}]}>
                            
                                         
                                         <Text style={styles.statusSubtext} > {selectedCar.pneu_status}</Text>
@@ -130,8 +134,8 @@ const CarsPage = ({ route }) => {
                          <View  style={styles.statusboxbig}> 
                           <Text style={[styles.statusTitle ]}> Óleo  </Text>
                             <View style={[styles.statusBox]}>
-                            <FontAwesome name="circle"  size={15} style={styles.statusIcon} color={getStatusColor(selectedCar.brake_pads_status)} />
-                                <View style={[styles.statusboxmenor,{ borderTopColor: getStatusColor(selectedCar.brake_pads_status) , borderTopWidth:2}]}>
+                            <FontAwesome name="circle"  size={15} style={styles.statusIcon} color={getStatusColor(selectedCar.oil_status)} />
+                                <View style={[styles.statusboxmenor,{ borderTopColor: getStatusColor(selectedCar.oil_status) , borderTopWidth:2}]}>
                                 
                                     
                                         <Text style={styles.statusSubtext} > {selectedCar.oil_status}</Text>

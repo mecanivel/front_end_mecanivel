@@ -112,6 +112,7 @@ const CardOpened = ({ route }) => {
       <View style={styles.containerImageName}>
         <Image source={{ uri: company.image }} style={styles.logo} />
         <Text style={styles.name}>{company.name}</Text>
+        <Text style={styles.text_grade}><Text style={styles.star}>★</Text>{company.reviews_note}</Text>
       </View>
       <Whatsappbutton phoneNumber={company.phone}/>
       <Text>{company.description}</Text>
@@ -155,6 +156,17 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 20,
     fontWeight: 'bold',
+    color: 'rgba(0, 0, 0, 1)',
+  },
+  text_grade: {
+    position: 'absolute',
+    marginLeft: 325,
+    top: 5,
+    color: '#ffd700',
+  }, 
+  star: { 
+    fontSize: 16,
+    color: '#ffd700',
   },
 });
 

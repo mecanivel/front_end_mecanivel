@@ -30,6 +30,12 @@ export default function ProfileInformation({ navigation }) {
         fetchToken();
     }, [getItem]);
 
+    useEffect(() => {
+        if (userId) {
+            fetchCustomersDetails();
+        }
+    }, [userId]);
+
     const parseJwt = (token) => {
         try {
             let base64Url = token.split('.')[1];
