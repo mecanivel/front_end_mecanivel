@@ -36,9 +36,9 @@ export default function RegisterCustomer() {
         
         if (response.ok) {
           Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
-          navigation.navigate('HomeScreen');
+          navigation.navigate('LoginPage');
         } else {
-          Alert.alert('Erro', data.message || 'Ocorreu um erro ao cadastrar.');
+          Alert.alert('Erro', response || 'Ocorreu um erro ao cadastrar.');
         }
       } else {
         Alert.alert('Erro', 'Resposta inesperada do servidor.');

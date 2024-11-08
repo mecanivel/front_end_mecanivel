@@ -1,40 +1,49 @@
 import AsyncStorage, { useAsyncStorage } from "@react-native-async-storage/async-storage";
-import React, { useEffect, useState } from "react";
-import { View, Text, Button, StyleSheet, ActivityIndicator,TouchableOpacity } from "react-native";
+import React, { useEffect, useState, useCallback } from "react";
+import { View, Text, Button, StyleSheet, ActivityIndicator, TouchableOpacity } from "react-native";
 import { FontAwesome } from '@expo/vector-icons';
-import { useNavigation } from "expo-router";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { CommonActions } from "@react-navigation/native";
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-
 
 export default function ProfileInformation({ navigation }) {
     const { getItem } = useAsyncStorage('token');
     const [userId, setUserId] = useState(null);
-    const [customers , setCustomers] = useState([]);
+    const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [userRole, setUserrole] = useState(null); 
+    const [userCompany , setUsercompany] = useState(null);
+
+    const fetchToken = async () => {
+        try {
+            const encryptedToken = await getItem();
+            if (encryptedToken) {
+                const decodedToken = parseJwt(encryptedToken);
+            
+                setUserId(decodedToken ? decodedToken.id : null);
+                setUserrole(decodedToken ? decodedToken.role : null);
+               
+
+                console.log("LOGANDO O ID DO USUARIO", userId);
+                
+            }
+        } catch (error) {
+            console.error("Erro ao recuperar o token:", error);
+        }
+        setLoading(false);
+    };
+
+    useFocusEffect(
+        useCallback(() => {
+            if (userId) { // Verifica se userId está definido antes de chamar fetchCustomersDetails
+                setLoading(true);
+                fetchCustomersDetails();
+            }
+            fetchToken();
+        }, [userId]) // Atualiza a dependência para verificar o userId
+    );
     
 
-    useEffect(() => {
-        const fetchToken = async () => {
-            try {
-                const encryptedToken = await getItem();
-                if (encryptedToken) {
-                    const decodedToken = parseJwt(encryptedToken);
-                    setUserId(decodedToken ? decodedToken.id : null);
-                }
-            } catch (error) {
-                console.error("Erro ao recuperar o token:", error);
-            }
-            setLoading(false);
-        };
-        fetchToken();
-    }, [getItem]);
-
-    useEffect(() => {
-        if (userId) {
-            fetchCustomersDetails();
-        }
-    }, [userId]);
 
     const parseJwt = (token) => {
         try {
@@ -60,30 +69,47 @@ export default function ProfileInformation({ navigation }) {
         AsyncStorage.removeItem('token');
         navigation.dispatch(
             CommonActions.reset({
-                index:0,
-                routes:[{name:'LoginScreen'}],
+                index: 0,
+                routes: [{ name: 'LoginScreen' }],
             })
-        )
-    }
-    
-    const fetchCustomersDetails = async () => {
-        if (!userId) return;
-        try {
-            const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/customers/all_customers?id=${userId}`);
-            if (response.ok) {
-                const customerData = await response.json();
-                setCustomers(customerData);
-            } else {
-                console.error("Erro ao buscar detalhes do cliente:", response.status);
-            }
-        } catch (error) {
-            console.error("Erro ao buscar detalhes da empresa:", error);
-        }
+        );
     };
 
-    useEffect(() => {
-        if (userId) fetchCustomersDetails();
-    }, [userId]);
+    
+
+    const fetchCustomersDetails = async () => {
+        if (!userId) return;
+        if(userRole === 'customer'){
+            try {
+                const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/customers/all_customers?id=${userId}`);
+                if (response.ok) {
+                    const customerData = await response.json();
+                    setUsers(customerData);
+                } else {
+                    console.error("Erro ao buscar detalhes do cliente:", response.status);
+                }
+            } catch (error) {
+                console.error("Erro ao buscar detalhes da empresa:", error);
+            }
+        }if (userRole  === 'mechanic_b2b') {
+            try {
+                const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/mechanics_b2b/all_mechanics_b2b?id=${userId}`);
+                if (response.ok) {
+                    const customerData = await response.json();
+                    console.log(customerData);
+                    
+                    setUsers(customerData);
+                    setUsercompany(customerData.company_id);
+                
+                } else {
+                    console.error("Erro ao buscar detalhes do cliente:", response.status);
+                }
+            } catch (error) {
+                console.error("Erro ao buscar detalhes da empresa:", error);
+            }
+        }
+        
+    };
 
     if (loading) {
         return (
@@ -93,54 +119,73 @@ export default function ProfileInformation({ navigation }) {
         );
     }
 
-    return (
-        <View style={styles.container}>
-            {userId === null ? (
-                <View style={styles.authContainer}>
 
-            
-                    <Text style={styles.text_inform_logout} >Você não está logado <MaterialIcons style={styles.icon_inform_logout} name="block"/></Text>
-                    <TouchableOpacity style={styles.authButton} onPress={() => navigation.navigate('LoginScreen')}>
-                        <FontAwesome name="sign-in" size={20} color="white" />
-                        <Text style={styles.authButtonText}>Login</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.authButton} onPress={() => navigation.navigate('RegisterScreen')}>
-                        <FontAwesome name="user-plus" size={20} color="white" />
-                        <Text style={styles.authButtonText}>Cadastrar</Text>
-                    </TouchableOpacity>
-
-                </View>
-            ) : (
-                <View>
-                    {customers.length > 0 ? (
-                        customers.map(customer => (
-                            <View style={styles.userContainer} key={customer.id}>
-                                <FontAwesome style={styles.iconUser} name="user" size={40} color="white" />
-                                <Text style={styles.nameCustomer}>{customer.name}</Text>
-
-                                <TouchableOpacity style={styles.button_log_out} onPress={() => handleLogOut()}>
-                                    <FontAwesome name="sign-out" size={35} color="blue" style={styles.icon_logout} />
-                                    
-                                </TouchableOpacity>
-                            </View>
-                            
-                        ))
-                    ) : (
-                        <Text>Informações do cliente não encontradas.</Text>
-                    )}
-                    <View style={styles.menuOptions}>
-                        <TouchableOpacity style={styles.button}>
-                            <FontAwesome name="clipboard" size={20} color="blue" style={styles.icon} />
-                            <Text style={styles.buttonText}>Serviços Solicitados</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CarPage',{customer_id : userId})}>
-                            <FontAwesome name="car" size={20} color="blue" style={styles.icon} />
-                            <Text style={styles.buttonText}>Meus Carros</Text>
+    const UserHeader = ({ users, handleLogOut }) => (
+        <>
+            {users.length > 0 ? (
+                users.map(user => (
+                    <View style={styles.userContainer} key={user.id}>
+                        <FontAwesome style={styles.iconUser} name="user" size={40} color="white" />
+                        <Text style={styles.nameCustomer}>{user.name}</Text>
+                        <TouchableOpacity style={styles.button_log_out} onPress={handleLogOut}>
+                            <FontAwesome name="sign-out" size={35} color="blue" style={styles.icon_logout} />
                         </TouchableOpacity>
                     </View>
-                </View>
+                ))
+            ) : (
+                <Text>Informações do cliente não encontradas.</Text>
+            )}
+        </>
+    );
+
+    const MenuOptions = ({ userRole, userId, userCompany, navigation }) => (
+        <View style={styles.menuOptions}>
+            {userRole !== 'mechanic_b2b' && (
+                <TouchableOpacity style={styles.button}>
+                    <FontAwesome name="clipboard" size={20} color="blue" style={styles.icon} />
+                    <Text style={styles.buttonText}>Serviços Solicitados</Text>
+                </TouchableOpacity>
+            )}
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CarPage', { customer_id: userId })}>
+                <FontAwesome name="car" size={20} color="blue" style={styles.icon} />
+                <Text style={styles.buttonText}>Meus Carros</Text>
+            </TouchableOpacity>
+            {userRole !== 'customer' && (
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CompanyRegister', { customer_id: userId, company_id: userCompany })}>
+                    <FontAwesome name="bank" size={20} color="blue" style={styles.icon} />
+                    <Text style={styles.buttonText}>Minha empresa</Text>
+                </TouchableOpacity>
             )}
         </View>
+    );
+
+    const AuthContainer = ({ navigation }) => (
+        <View style={styles.authContainer}>
+            <Text style={styles.text_inform_logout}>
+                Você não está logado <MaterialIcons style={styles.icon_inform_logout} name="block" />
+            </Text>
+            <TouchableOpacity style={styles.authButton} onPress={() => navigation.navigate('LoginScreen')}>
+                <FontAwesome name="sign-in" size={20} color="white" />
+                <Text style={styles.authButtonText}>Login</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.authButton} onPress={() => navigation.navigate('RegisterScreen')}>
+                <FontAwesome name="user-plus" size={20} color="white" />
+                <Text style={styles.authButtonText}>Cadastrar</Text>
+            </TouchableOpacity>
+        </View>
+    );
+    
+    return (
+        <View style={styles.container}>
+        {userId !== null ? (
+            <View>
+                <UserHeader users={users} handleLogOut={handleLogOut} />
+                <MenuOptions userRole={userRole} userId={userId} userCompany={userCompany} navigation={navigation} />
+            </View>
+        ) : (
+            <AuthContainer navigation={navigation} />
+        )}
+    </View>
     );
 }
 
@@ -149,17 +194,15 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#f4f4f4',
     },
-    icon_inform_logout:{
-        color:"#dc143c",
-        fontSize:20
-
+    icon_inform_logout: {
+        color: "#dc143c",
+        fontSize: 20
     },
-    text_inform_logout:{
-        fontSize:20,
-        marginBottom:30,
-        alignItems:'center',
+    text_inform_logout: {
+        fontSize: 20,
+        marginBottom: 30,
+        alignItems: 'center',
         flexDirection: 'row'
-        
     },
     loaderContainer: {
         flex: 1,
@@ -170,7 +213,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-    },
+    }, 
     authButton: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -210,7 +253,7 @@ const styles = StyleSheet.create({
     },
     button_log_out: {
         flexDirection: 'row',
-        justifyContent:'flex-end',
+        justifyContent: 'flex-end',
         alignItems: 'center',
         backgroundColor: '#364c5d',
         padding: 10,

@@ -6,6 +6,7 @@ import LoginScreen from '@/pages/Login_page';
 import CarPage from '@/pages/Cars_customer';
 import CarRegister from '@/pages/Register_cars';
 import RegisterPage from '@/pages/register_page';
+import CompanyRegister from '@/pages/Register_company';
 const Stack = createNativeStackNavigator();
 
 function HomeStack() {
@@ -41,6 +42,7 @@ function HomeStack() {
                 component={CarRegister} 
                 options={{ headerShown: false }}
             />
+            
         </Stack.Navigator>
     );
 }

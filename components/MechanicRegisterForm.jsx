@@ -35,7 +35,7 @@ export default function MechanicRegisterForm() {
         
         if (response.ok) {
           Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
-          navigation.navigate('HomeScreen');
+          navigation.navigate('LoginScreen');
         } else {
           Alert.alert('Erro', data.message || 'Ocorreu um erro ao cadastrar.');
         }

@@ -10,24 +10,23 @@ export default function LoginScreen() {
   const navigation = useNavigation();
 
   const handleLogin = async () => {
-
     try {
-        const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/auth`, {
-          username,
-          password
-        });
-        if(response.data.token){
-          await AsyncStorage.setItem('token', response.data.token);
-          navigation.navigate('MainTabs');
-          
-        }else {
-          Alert.alert('erro', 'Credenciais inválidas');
-        }
+      const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/auth`, {
+        username,
+        password
+      });
+      if (response.data.token) {
+        await AsyncStorage.setItem('token', response.data.token);
+        navigation.navigate('MainTabs');
+      } else {
+        Alert.alert('Erro', 'Credenciais inválidas');
+      }
     } catch (error) {
       Alert.alert('Erro', 'Credenciais inválidas');
       console.error(error);
     }
   };
+
 
   return (
     <View style={styles.container}>
