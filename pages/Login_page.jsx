@@ -31,7 +31,7 @@ export default function LoginScreen() {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../assets/images/logo_mecanivel.jpg')} 
+        source={require('../assets/images/mecanivel_logo.png')} 
         style={styles.logo}
       />
       <TextInput

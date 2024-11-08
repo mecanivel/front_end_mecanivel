@@ -14,6 +14,10 @@ export default function RegisterScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
+
+      <View style={styles.logoContainer}>
+        <Image source={require('../assets/images/mecanivel_logo.png')} style={styles.logo} />
+      </View>
  
 
       
@@ -53,7 +57,10 @@ const styles = StyleSheet.create({
   },
   logo: {
     width: 150,
-    height: 100,
+    height: 50,
+    marginBottom: 0,
+    padding: 0,
+    marginLeft: 95,
     resizeMode: 'contain',
     marginBottom: 20,
   },
