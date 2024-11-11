@@ -10,13 +10,13 @@ export default function ReviewsContainer({ companyId }) {
     useEffect(() => {
         const fetchReviews = async () => {
             try {
-                console.log("company ID", companyId);
+                ("company ID", companyId);
                 
                 const response = await axios.get(`${process.env.EXPO_PUBLIC_API_URL}/reviews/all_reviews?companyId=${companyId}`);
-                console.log("LOGANDO URL CONTAINER REVIEW", `${process.env.EXPO_PUBLIC_API_URL}/reviews/all_reviews?companyId=${companyId}`);
+                ("LOGANDO URL CONTAINER REVIEW", `${process.env.EXPO_PUBLIC_API_URL}/reviews/all_reviews?companyId=${companyId}`);
                 
                 const reviewData = response.data;
-                console.log("REVIEWS",reviewData);
+                ("REVIEWS",reviewData);
 
                 
                 setReviews(reviewData);

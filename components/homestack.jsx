@@ -7,6 +7,7 @@ import CarPage from '@/pages/Cars_customer';
 import CarRegister from '@/pages/Register_cars';
 import RegisterPage from '@/pages/register_page';
 import CompanyRegister from '@/pages/Register_company';
+import SelectServices from '@/pages/Select_services';
 const Stack = createNativeStackNavigator();
 
 function HomeStack() {
@@ -22,11 +23,7 @@ function HomeStack() {
                 component={OpenedCard} 
                 options={{ headerShown: false }}
             />
-            <Stack.Screen 
-                name="LoginPage" 
-                component={LoginScreen} 
-                options={{ headerShown: false }}
-            />
+            
             <Stack.Screen 
                 name="CarPage" 
                 component={CarPage} 
@@ -42,7 +39,16 @@ function HomeStack() {
                 component={CarRegister} 
                 options={{ headerShown: false }}
             />
-            
+            <Stack.Screen 
+                        name="SelectServices" 
+                        component={SelectServices} 
+                        options={{ headerShown: false }}
+            />
+             <Stack.Screen 
+                        name="CompanyRegister" 
+                        component={CompanyRegister} 
+                        options={{ headerShown: false }}
+                    />
         </Stack.Navigator>
     );
 }

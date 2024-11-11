@@ -14,6 +14,8 @@ const ServicesCardCompany = ({ companyId }) => {
                 const response = await axios.get(`${process.env.EXPO_PUBLIC_API_URL}/services/filter_services_by_companies?companyId=${companyId}`);
                 const serviceIds = response.data.map(service => service.serviceId);
                 
+                console.log("SERVICES IDS PESQUISADOS COM O ID DA COMPANY",serviceIds);
+                
                 fetchServiceDetails(serviceIds);
             } catch (error) {
                 console.error("Erro ao buscar IDs dos serviços:", error);
@@ -22,9 +24,11 @@ const ServicesCardCompany = ({ companyId }) => {
 
         const fetchServiceDetails = async (serviceIds) => {
             try {
-                console.log("LOGANDO IDS DOS SERVIÇOS", `${serviceIds.join(',')}`);
+                ("LOGANDO IDS DOS SERVIÇOS", `${serviceIds.join(',')}`);
                 const response = await axios.get(`${process.env.EXPO_PUBLIC_API_URL}/services/all_services?id=${serviceIds.join(',')}`);
 
+                console.log(`${process.env.EXPO_PUBLIC_API_URL}/services/all_services?id=${serviceIds.join(',')}`);
+                
                 if (response.data.length > 0) {
                     const servicesData = response.data.map(item => {
                         const base64String = convertArrayBufferToBase64(item.image.data);

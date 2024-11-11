@@ -28,7 +28,7 @@ export default function FormCompanyRegister() {
             }
             setModalVisible(false);
         } catch (error) {
-            console.log("Erro ao escolher imagem da galeria", error);
+            ("Erro ao escolher imagem da galeria", error);
         }
     };
 
@@ -46,7 +46,7 @@ export default function FormCompanyRegister() {
             }
             setModalVisible(false);
         } catch (error) {
-            console.log("Erro ao tirar foto:", error);
+            ("Erro ao tirar foto:", error);
         }
     };
 
@@ -71,11 +71,11 @@ export default function FormCompanyRegister() {
                 method: 'POST',
                 body: formData,
             });
-            console.log(response);
+            (response);
             
             if (response.ok) {
                 const data = await response.json();
-                console.log('Carro criado com sucesso:', data);
+                ('Carro criado com sucesso:', data);
 
                 
 
@@ -101,7 +101,7 @@ export default function FormCompanyRegister() {
                 Alert.alert('Erro', 'Não foi possível criar a emprea. Tente novamente.');
             }
         } catch (error) {
-            console.log(error);
+            (error);
             
         }
 

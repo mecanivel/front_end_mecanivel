@@ -29,7 +29,7 @@ const CarRegistrationScreen = ({ route }) => {
             setImage(result.assets[0].uri);
         }
        } catch (error) {
-         console.log("erro escolhendo imagem da galeria", error);
+         ("erro escolhendo imagem da galeria", error);
          
        }
     };
@@ -48,7 +48,7 @@ const CarRegistrationScreen = ({ route }) => {
                 setImage(result.assets[0].uri);
             }
             }catch (error) {
-            console.log("Erro ao tirar foto:", error);
+            ("Erro ao tirar foto:", error);
         }
     };
 
@@ -78,7 +78,7 @@ const CarRegistrationScreen = ({ route }) => {
 
             if (response.ok) {
                 const data = await response.json();
-                console.log('Carro criado com sucesso:', data);
+                ('Carro criado com sucesso:', data);
 
                 
 

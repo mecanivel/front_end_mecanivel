@@ -14,7 +14,7 @@ const LocationComponent = ({ address }) => {
   const fetchCoordinates = async () => {
     try {
       const apiKey = 'AIzaSyCi-4r1QhwyPIvNqWqDLZVU8DhN06bShMQ'; 
-      console.log(address);
+      (address);
       
       const response = await axios.get(
         `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}&sensor=false`

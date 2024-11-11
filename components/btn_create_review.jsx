@@ -37,7 +37,7 @@ const ButtonCreateReview = ({ companyId, customerId }) => {
    
     
     try {
-        console.log(reviewData);
+        (reviewData);
       await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/reviews/create_review`, reviewData);
       Alert.alert('Sucesso', 'Avaliação enviada com sucesso!');
       closeModal();

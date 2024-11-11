@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import { useNavigation } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function RegisterCustomer() {
   const [name, setName] = useState('');
@@ -9,6 +10,7 @@ export default function RegisterCustomer() {
   const [phone, setPhone] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false)
   const navigation = useNavigation();
 
   const handleRegister = async () => {
@@ -28,7 +30,7 @@ export default function RegisterCustomer() {
         body: JSON.stringify({ name, cpf: Cpf, phone, username, password }),
       });
 
-      console.log(response);
+      (response);
       
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.includes("application/json")) {
@@ -36,7 +38,7 @@ export default function RegisterCustomer() {
         
         if (response.ok) {
           Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
-          navigation.navigate('LoginPage');
+          navigation.navigate('LoginScreen');
         } else {
           Alert.alert('Erro', response || 'Ocorreu um erro ao cadastrar.');
         }
@@ -44,7 +46,7 @@ export default function RegisterCustomer() {
         Alert.alert('Erro', 'Resposta inesperada do servidor.');
       }
     } catch (error) {
-      console.log(error);
+      (error);
       Alert.alert('Erro', 'Não foi possível conectar ao servidor.');
     }
   };
@@ -56,7 +58,18 @@ export default function RegisterCustomer() {
       <TextInput style={styles.input} placeholder="CPF" value={Cpf} onChangeText={setCpf} />
       <TextInput style={styles.input} placeholder="Telefone" value={phone} onChangeText={setPhone} />
       <TextInput style={styles.input} placeholder="Usuario" value={username} onChangeText={setUsername} />
-      <TextInput style={styles.input} placeholder="Senha" secureTextEntry value={password} onChangeText={setPassword} />
+      <View style={styles.passwordContainer}>
+        <TextInput
+          style={styles.passwordInput}
+          placeholder="Senha"
+          secureTextEntry={!showPassword}
+          value={password}
+          onChangeText={setPassword}
+        />
+        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+          <MaterialIcons style={styles.iconShowpassword} name={showPassword ? "visibility-off" : "visibility"} size={24} color="gray" />
+        </TouchableOpacity>
+      </View>
 
       <TouchableOpacity style={styles.button} onPress={handleRegister}>
         <Text style={styles.buttonText}>Registrar-se</Text>
@@ -70,11 +83,12 @@ export default function RegisterCustomer() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFF', padding: 24 },
-  logo: { width: 200, height: 100, resizeMode: 'contain', marginBottom: 20 },
-  title: { fontSize: 16, color: 'rgba(0, 0, 0, .5)', fontWeight: 'regular', marginRight: 240, marginBottom: 20 },
   input: { width: '100%', height: 50, backgroundColor: '#FFF', borderColor: 'rgba(0, 0, 0, 1)', borderWidth: 1, borderRadius: 2, paddingHorizontal: 16, marginBottom: 16 },
+  passwordContainer: { flexDirection: 'row', alignItems: 'center', width: '100%', borderColor: 'rgba(0, 0, 0, 1)', borderWidth: 1, borderRadius: 2, marginBottom: 16 },
+  passwordInput: { flex: 1, height: 50, paddingHorizontal: 16 },
   button: { width: '100%', height: 50, backgroundColor: '#34495E', borderRadius: 8, justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
   buttonText: { color: '#FFFFFF', fontSize: 16, fontWeight: 'bold' },
   buttonExit: {},
+  iconShowpassword:{marginRight:10},
   buttonTextExit: { color: '#4664FF', fontSize: 14 },
 });

@@ -40,7 +40,7 @@ const CarsPage = ({ route }) => {
     );
     
     const getStatusColor = (status) => {
-        console.log("STATUS", status);
+        ("STATUS", status);
         
         switch (status) {
             case 'BOM':

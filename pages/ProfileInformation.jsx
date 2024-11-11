@@ -9,7 +9,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 export default function ProfileInformation({ navigation }) {
     const { getItem } = useAsyncStorage('token');
     const [userId, setUserId] = useState(null);
-    const [users, setUsers] = useState([]);
+    const [users, setUsers] = useState(null);
     const [loading, setLoading] = useState(true);
     const [userRole, setUserrole] = useState(null); 
     const [userCompany , setUsercompany] = useState(null);
@@ -17,32 +17,45 @@ export default function ProfileInformation({ navigation }) {
     const fetchToken = async () => {
         try {
             const encryptedToken = await getItem();
+           
+
             if (encryptedToken) {
                 const decodedToken = parseJwt(encryptedToken);
-            
-                setUserId(decodedToken ? decodedToken.id : null);
-                setUserrole(decodedToken ? decodedToken.role : null);
+              
+                const userIdfromtoken = decodedToken.id;
+
+                setUserId(userIdfromtoken);
+                setUserrole(decodedToken.role);
                
 
-                console.log("LOGANDO O ID DO USUARIO", userId);
+                
                 
             }
+            setLoading(false);
         } catch (error) {
             console.error("Erro ao recuperar o token:", error);
+            setLoading(false);
         }
-        setLoading(false);
+        
     };
 
     useFocusEffect(
-        useCallback(() => {
-            if (userId) { // Verifica se userId está definido antes de chamar fetchCustomersDetails
-                setLoading(true);
-                fetchCustomersDetails();
-            }
-            fetchToken();
-        }, [userId]) // Atualiza a dependência para verificar o userId
-    );
-    
+    useCallback(() => {
+        const initialize = async () => {
+            await fetchToken();
+            fetchCustomersDetails();
+        };
+        
+        initialize();
+    }, [])
+);
+
+useEffect(() => {
+    if (userId && userRole) {
+        fetchCustomersDetails();
+    }
+}, [userId, userRole]);
+
 
 
     const parseJwt = (token) => {
@@ -78,13 +91,18 @@ export default function ProfileInformation({ navigation }) {
     
 
     const fetchCustomersDetails = async () => {
-        if (!userId) return;
+        (userRole);
+        
         if(userRole === 'customer'){
             try {
                 const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/customers/all_customers?id=${userId}`);
                 if (response.ok) {
                     const customerData = await response.json();
+
                     setUsers(customerData);
+
+                    ("CUSTOMER DATA CLIENTE",users);
+                    
                 } else {
                     console.error("Erro ao buscar detalhes do cliente:", response.status);
                 }
@@ -96,10 +114,14 @@ export default function ProfileInformation({ navigation }) {
                 const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/mechanics_b2b/all_mechanics_b2b?id=${userId}`);
                 if (response.ok) {
                     const customerData = await response.json();
-                    console.log(customerData);
-                    
                     setUsers(customerData);
-                    setUsercompany(customerData.company_id);
+                    
+                    if (customerData.length > 0) {
+                        setUsercompany(customerData[0].company_id);
+                        ("EMPRESA TELA PERFIL", customerData[0].company_id);
+                    } else {
+                        console.warn("Dados de cliente estão vazios.");
+                    }
                 
                 } else {
                     console.error("Erro ao buscar detalhes do cliente:", response.status);
@@ -119,10 +141,13 @@ export default function ProfileInformation({ navigation }) {
         );
     }
 
+    
+    
 
     const UserHeader = ({ users, handleLogOut }) => (
+        
         <>
-            {users.length > 0 ? (
+            {users !== null ? (
                 users.map(user => (
                     <View style={styles.userContainer} key={user.id}>
                         <FontAwesome style={styles.iconUser} name="user" size={40} color="white" />
@@ -132,9 +157,7 @@ export default function ProfileInformation({ navigation }) {
                         </TouchableOpacity>
                     </View>
                 ))
-            ) : (
-                <Text>Informações do cliente não encontradas.</Text>
-            )}
+            ): <Text>Não está logado</Text>}
         </>
     );
 
@@ -146,10 +169,12 @@ export default function ProfileInformation({ navigation }) {
                     <Text style={styles.buttonText}>Serviços Solicitados</Text>
                 </TouchableOpacity>
             )}
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CarPage', { customer_id: userId })}>
+
+            { userRole !== 'mechanic_b2b' && ( <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CarPage', { customer_id: userId })}>
                 <FontAwesome name="car" size={20} color="blue" style={styles.icon} />
                 <Text style={styles.buttonText}>Meus Carros</Text>
-            </TouchableOpacity>
+            </TouchableOpacity>)}
+
             {userRole !== 'customer' && (
                 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CompanyRegister', { customer_id: userId, company_id: userCompany })}>
                     <FontAwesome name="bank" size={20} color="blue" style={styles.icon} />
@@ -164,6 +189,7 @@ export default function ProfileInformation({ navigation }) {
             <Text style={styles.text_inform_logout}>
                 Você não está logado <MaterialIcons style={styles.icon_inform_logout} name="block" />
             </Text>
+            
             <TouchableOpacity style={styles.authButton} onPress={() => navigation.navigate('LoginScreen')}>
                 <FontAwesome name="sign-in" size={20} color="white" />
                 <Text style={styles.authButtonText}>Login</Text>
@@ -175,11 +201,15 @@ export default function ProfileInformation({ navigation }) {
         </View>
     );
     
+
+   
     return (
         <View style={styles.container}>
         {userId !== null ? (
             <View>
+                
                 <UserHeader users={users} handleLogOut={handleLogOut} />
+
                 <MenuOptions userRole={userRole} userId={userId} userCompany={userCompany} navigation={navigation} />
             </View>
         ) : (

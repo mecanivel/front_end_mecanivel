@@ -19,7 +19,7 @@ const HomeScreen = () => {
         }
       }); 
       const json = await response.json();
-      console.log(json);
+      (json);
       
       const updatedData = await Promise.all(
         json.map(async (item) => {

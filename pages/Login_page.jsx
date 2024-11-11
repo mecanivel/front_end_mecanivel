@@ -1,22 +1,31 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage, { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import { useNavigation } from 'expo-router';
 
 export default function LoginScreen() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigation = useNavigation();
+  const { setItem } = useAsyncStorage('token');
 
   const handleLogin = async () => {
     try {
+
+      ("username",username,"password",password);
+      
       const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/auth`, {
         username,
         password
       });
+     
+
       if (response.data.token) {
-        await AsyncStorage.setItem('token', response.data.token);
+        ("SALVANDO O TOKEN",response.data.token);
+        let token = response.data.token;
+
+        await setItem(token);
         navigation.navigate('MainTabs');
       } else {
         Alert.alert('Erro', 'Credenciais inválidas');

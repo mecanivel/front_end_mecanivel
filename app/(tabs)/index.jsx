@@ -32,16 +32,8 @@ const App = () => {
                         component={RegisterScreen}
                         options={{ headerShown: false }}
                     />
-                    <Stack.Screen 
-                        name="CompanyRegister" 
-                        component={CompanyRegister} 
-                        options={{ headerShown: false }}
-                    />
-                    <Stack.Screen 
-                        name="SelectServices" 
-                        component={SelectServices} 
-                        options={{ headerShown: false }}
-                    />
+                   
+                    
                 </Stack.Navigator>
             </NavigationContainer>
         </GestureHandlerRootView>

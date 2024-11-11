@@ -1,39 +1,109 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
+import { View, Text, Image, StyleSheet, ActivityIndicator, FlatList, Modal, Button } from 'react-native';
 import Location from '@/components/Location';
 import ServicesCompany from '@/components/services_company_card';
 import Whatsappbutton from '@/components/whatsapp_btn';
 import ButtonCreateReview from '@/components/btn_create_review';
 import ReviewContainer from '@/components/reviews_container';
 import { decode } from 'react-native-pure-jwt';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 const CardOpened = ({ route }) => {
   const { companyId } = route.params;
   const [company, setCompany] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState('');
+  const [userRole, setUserrole] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [services , setServices] = useState(null);
   const { getItem } = useAsyncStorage('token');
-
+  const [selectedServices, setSelectedServices] = useState([]);
+  const [userCompany , setUsercompany] = useState(null);
+  const [users , setUsers] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   useEffect(() => {
     const fetchToken = async () => {
       try {
         const encryptedToken = await getItem();
         if (encryptedToken) {
           const decodedToken = parseJwt(encryptedToken);
-          console.log(decodedToken);
+          (decodedToken);
           
           setUserId(decodedToken ? decodedToken.id : null);
-          console.log("LOGANDO ID USER ", userId);
+          setUserrole(decodedToken ? decodedToken.role : null);
+          ("LOGANDO ID USER ", userId);
           
         }
       } catch (error) {
         console.error("Erro ao recuperar o token:", error);
       }
     };
-
+    fecthServices();
     fetchToken();
+    fetchCustomersDetails();
   }, [getItem]);
+
+
+  const fecthServices = async () => {
+     try {
+        const response = await axios.get(`${process.env.EXPO_PUBLIC_API_URL}/services/all_services`)
+        
+        const dataServices = response.data;
+
+        setServices(dataServices);
+        ("DATA SERVICES CARD OPENED", services);
+     } catch (error) {
+      
+     }
+  }
+
+  const fetchCustomersDetails = async () => {
+    (userRole);
+    
+    if(userRole === 'customer'){
+        try {
+            const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/customers/all_customers?id=${userId}`);
+            if (response.ok) {
+                const customerData = await response.json();
+
+                setUsers(customerData);
+
+                ("CUSTOMER DATA CLIENTE",users);
+                
+            } else {
+               
+            }
+        } catch (error) {
+           
+        }
+    }if (userRole  === 'mechanic_b2b') {
+        try {
+            const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/mechanics_b2b/all_mechanics_b2b?id=${userId}`);
+            if (response.ok) {
+                const customerData = await response.json();
+                setUsers(customerData);
+                
+                if (customerData.length > 0) {
+                    setUsercompany(customerData[0].company_id);
+                    console.log("EMPRESA TELA servicos", customerData[0].company_id);
+                } else {
+                    console.warn("Dados de cliente estão vazios.");
+                }
+            
+            } else {
+                
+            }
+        } catch (error) {
+            
+        }
+    }
+    
+};
+
 
   const parseJwt = (token) => {
     try {
@@ -71,7 +141,7 @@ const CardOpened = ({ route }) => {
         setCompany(item);
       }
     } catch (error) {
-      console.error('Erro ao buscar detalhes da empresa:', error);
+      
     } finally {
       setLoading(false);
     }
@@ -107,6 +177,66 @@ const CardOpened = ({ route }) => {
     return <Text>Empresa não encontrada</Text>;
   }
 
+  const handleServiceSelect = (serviceId) => {
+    setSelectedServices((prevSelected) => {
+      if (prevSelected.includes(serviceId)) {
+        return prevSelected.filter(id => id !== serviceId); 
+      } else {
+        return [...prevSelected, serviceId]; 
+      }
+    });
+  };
+
+  const renderServiceItem = ({ item }) => (
+    <TouchableOpacity onPress={() => handleServiceSelect(item.id)}>
+      <View style={styles.serviceItem}>
+        <View style={styles.radioContainer}>
+          <FontAwesome
+            name={selectedServices.includes(item.id) ? "dot-circle-o" : "circle-o"}
+            size={20}
+            color="#fff"
+            style={styles.radioIcon}
+          />
+          <Text style={styles.descriptionServicesmodal}>{item.description}</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+
+
+
+
+  const handleSaveServices = async () => {
+    try {
+      const payload = {
+        id_company: companyId, 
+        description: "Alinhamento e Balanceamento", 
+        company_name: company.name,
+      };
+  
+      for (const serviceId of selectedServices) {
+        (payload);
+        
+        
+        await axios.patch(`${process.env.EXPO_PUBLIC_API_URL}/services/update_service/${serviceId}`, payload);
+      }
+      
+      alert("Serviços atualizados com sucesso!");
+      setModalVisible(false);
+      setSelectedServices([]); 
+    } catch (error) {
+      console.error("Erro ao atualizar serviços:", error);
+    }
+  };
+  
+
+  const handleEditClick = () => {
+    setIsModalOpen(true);
+  };
+
+
+
+
   const renderContent = () => (
     <View style={styles.contentContainer}>
       <View style={styles.containerImageName}>
@@ -120,13 +250,53 @@ const CardOpened = ({ route }) => {
       <Location address={company.address}/>
       <ServicesCompany companyId={companyId}/>
       <ReviewContainer companyId={companyId}/>
-      <ButtonCreateReview companyId={companyId} customerId={userId} />
+      <View style={styles.btnaddservicescontainer}>
+
+   { userRole === 'mechanic_b2b' && companyId === userCompany && userCompany !== null ?   ( <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.btnaddservices}>
+                     <Text style={styles.textbtnaddservices}>Adicionar Serviços <AntDesign name="plus" size={24} style={styles.shareIcon} /></Text>  
+      </TouchableOpacity>): 
+       userRole === 'customer' ? (
+        <ButtonCreateReview companyId={companyId} customerId={userId} />
+       ): null }
+
+{companyId === userCompany && (
+       <TouchableOpacity onPress={handleEditClick} style={styles.btneditcompany}>
+          <Text style={styles.textbtnaddservices}>Editar Empresa</Text>
+       </TouchableOpacity>
+      )}
+</View> 
+     
+
+
+   
+<Modal
+  visible={modalVisible}
+  animationType="slide"
+  transparent={true}
+  onRequestClose={() => setModalVisible(false)}
+>
+  <View style={styles.modalContainer}>
+    <View style={styles.modalContent}>
+      <Text style={styles.modalTitle}>Registrar Serviços</Text>
+      <FlatList
+        data={services}
+        renderItem={renderServiceItem}
+        keyExtractor={(item) => item.id}
+      />
+      <View style={styles.modalButtons}>
+        <Button title="Cancelar" onPress={() => setModalVisible(false)} />
+        <Button title="Salvar Serviço" onPress={handleSaveServices} />
+      </View>
+    </View>
+  </View>
+</Modal>
+
     </View>
   );
 
   return (
     <FlatList
-      data={[{}]} // Dummy data para renderizar uma única vez
+      data={[{}]} 
       renderItem={renderContent}
       keyExtractor={() => "unique_key"}
       style={styles.container}
@@ -135,6 +305,67 @@ const CardOpened = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
+  btneditcompany:{
+    backgroundColor:'#3c4c64',
+    width:160,
+    height:40,
+    borderRadius:20,
+    alignItems:'center',
+    display:'flex',
+    justifyContent:'center'
+  },
+  descriptionServicesmodal:{
+    color:'#fff',
+    marginLeft:4
+  },
+  serviceItem: {
+    padding: 10,
+    backgroundColor: '#3c4c64',
+    borderRadius: 5,
+    marginBottom: 10,
+    color:'#fff',
+
+},
+radioContainer: {
+  flexDirection: 'row',
+  alignItems: 'center',
+},
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+},
+modalContent: {
+    height: '30%', 
+    backgroundColor: '#3c4c64',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 16,
+},
+modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 20,
+    textAlign: 'center',
+},
+  textbtnaddservices:{
+    color:'#fff',
+    
+  },
+  btnaddservicescontainer:{
+   display:'flex',
+   alignItems:'center'
+  },
+    btnaddservices:{
+    justifyContent:'center',
+    backgroundColor:"#607D8B",
+    width:"55%",
+    height:"33%",
+    alignItems:'center',
+    padding:5,
+    borderRadius:20
+  },
   container: {
     flex: 1,
     padding: 10,
